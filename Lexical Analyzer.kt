@@ -1,12 +1,15 @@
 fun main () {
-    print ("Please enter a mathematical equation: ")
-    var str = readLine ().toString()
+    var continueExpr = "1"
+    while (continueExpr != "0") {
+        print ("Please enter a mathematical equation: ")
+        var str = readLine ().toString ()
 
-    str = inputStringModifier (str)
-    var lexemeList = fillLexemeList (str)
+        str = inputStringModifier (str)
+        var lexemeList = fillLexemeList (str)
+        lexicalAnalysis (lexemeList)
 
-    for (i in 0 until lexemeList.size) {
-        print(lexemeList[i] + " ")
+        print ("Continue? (Enter 0 to stop): ")
+        continueExpr = readLine ().toString ()
     }
 }
 
@@ -45,6 +48,7 @@ fun lexemeChecker (stringer: String): String {
         ")" -> return "RPAREN"
         "p" -> return "PI"
         "e" -> return "E"
+        "" -> return ""
     }
 
     if (stringer.toDoubleOrNull () != null) {
@@ -52,7 +56,77 @@ fun lexemeChecker (stringer: String): String {
         return "NUMBER(" + num + ")"
     }
 
-    return ""
+    throw IllegalArgumentException ("Invalid syntax: $stringer is not a valid lexeme")
+}
+
+fun lexicalAnalysis (lexemeList: List <String>) {
+    var lParenCount = 0
+    var rParenCount = 0
+
+    printList (lexemeList)
+
+    if (!(lexemeList.first ().startsWith("NUM")) && lexemeList.first () != "LPAREN" && lexemeList.first () != "PI"
+            && lexemeList.first () != "E") {
+        throw ArithmeticException ("Invalid syntax: cannot have an operator or rparen at the beginning of the" +
+                " expression")
+    }
+
+    if (!(lexemeList.last ().startsWith("NUM")) && lexemeList.last () != "RPAREN" && lexemeList.last () != "PI"
+            && lexemeList.last () != "E") {
+        throw ArithmeticException ("Invalid syntax: cannot have an operator or lparen at the end of the expression")
+    }
+
+    if (lexemeList.last () == "RPAREN") {
+        rParenCount++
+    }
+
+    for (i in 0 until lexemeList.size - 1) {
+        when (lexemeList [i]) {
+            "PLUS", "MINUS", "TIMES", "POWER" ->
+                if (!lexemeList [i + 1].startsWith("NUM") && lexemeList [i + 1] != "LPAREN"
+                        && lexemeList [i + 1] != "PI" && lexemeList [i + 1] != "E") {
+                    throw ArithmeticException ("Invalid syntax: operator must be followed by a number or lparen")
+                }
+            "DIVIDES" ->
+                if (!lexemeList [i + 1].startsWith("NUM") && lexemeList [i + 1] != "LPAREN"
+                        && lexemeList [i + 1] != "PI" && lexemeList [i + 1] != "E") {
+                    throw ArithmeticException("Invalid syntax: operator must be followed by a number or lparen")
+                } else if (lexemeList[i + 1] == "NUMBER(0.0)") {
+                    throw ArithmeticException ("Invalid syntax: cannot divide by zero")
+                }
+            "LPAREN" -> if ((!lexemeList [i + 1].startsWith("NUM") && lexemeList [i + 1] != "PI"
+                            && lexemeList [i + 1] != "E" && lexemeList [i + 1] != "LPAREN")
+                            || lexemeList [i + 1] == "RPAREN") {
+                    throw ArithmeticException ("Invalid syntax: lparen must be followed by a numeric  value or" +
+                            "another lparen")
+                } else {
+                    lParenCount++
+                }
+            "RPAREN" -> if (lexemeList [i + 1].startsWith("NUM") || lexemeList [i + 1] == "PI"
+                            || lexemeList [i + 1] == "E" || lexemeList [i + 1] == "LPAREN") {
+                    throw ArithmeticException ("Invalid syntax: rparen must be followed by an operator or another " +
+                            "rparen")
+                } else {
+                    rParenCount++
+                }
+            "PI", "E" ->
+                if (lexemeList [i + 1].startsWith ("NUM") || lexemeList [i + 1] == "PI"
+                        || lexemeList [i + 1] == "E" || lexemeList [i + 1] == "LPAREN") {
+                    throw ArithmeticException ("Invalid syntax: numeric elements must be followed " +
+                            "with an operator or rparen")
+                }
+            else ->
+                if (lexemeList [i + 1].startsWith ("NUM") || lexemeList [i + 1] == "PI"
+                        || lexemeList [i + 1] == "E" || lexemeList [i + 1] == "LPAREN") {
+                    throw ArithmeticException("Invalid syntax: numeric elements must be followed " +
+                            "with an operator or rparen")
+                }
+        }
+    }
+
+    if (lParenCount != rParenCount) {
+        throw ArithmeticException ("Invalid syntax: parentheses do not match")
+    }
 }
 
 fun inputStringModifier (stringer: String): String {
@@ -60,4 +134,11 @@ fun inputStringModifier (stringer: String): String {
     str = str.replace (" ", "")
     str = str.replace ("pi", "p")
     return str
+}
+
+fun printList (list : List <String>) {
+    for (i in 0 until list.size) {
+        print(list[i] + " ")
+    }
+    println()
 }
