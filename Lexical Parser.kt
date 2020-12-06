@@ -1,5 +1,5 @@
 fun main () {
-    var stringer = lexemeTree (mutableListOf ("NUMBER(1.8)", "PLUS", "LPAREN", "NUMBER(9)", "TIMES", "NUMBER(4)", "RPAREN", "POWER", "NUMBER(7)"))
+    var stringer = lexemeTree (mutableListOf ("E", "POWER", "LPAREN", "PI", "MINUS", "NUMBER(2)", "RPAREN"))
     printEvaluatorOrder (stringer)
 }
 
@@ -8,7 +8,18 @@ fun lexemeTree (s: MutableList<String>): lexNode.exprNode<String> {
 
     if (s[0] != "LPAREN") {
         var parentNode = lexNode.exprNode<String>(s[1])
-        var valNode = lexNode.numNode<String>(s[0].substring(7, s[0].indexOf(")")))
+        var valNode =
+                when (s[0]) {
+                    "PI" -> {
+                        lexNode.numNode<String>(Math.PI.toString())
+                    }
+                    "E" -> {
+                        lexNode.numNode<String>(Math.E.toString())
+                    }
+                    else -> {
+                        lexNode.numNode<String>(s[0].substring(7, s[0].indexOf(")")))
+                    }
+                }
         header = parentNode
         header.setLhs(valNode)
     } else {
