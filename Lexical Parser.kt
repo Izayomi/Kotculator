@@ -1,4 +1,9 @@
-fun lexemeTree(s: List<String>): lexNode.exprNode<String> {
+fun main () {
+    var stringer = lexemeTree (mutableListOf ("NUM(1.0)", "POWER", "NUM(2.0)", "TIMES", "NUM(17.0)", "PLUS", "LPAREN", "NUM(1.0)", "POWER", "NUM(5.6)", "RPAREN"))
+    print (stringer.value)
+}
+
+fun lexemeTree (s: List<String>): lexNode.exprNode<String> {
     var header = lexNode.exprNode<String>("")
     var current = header
 
@@ -6,10 +11,16 @@ fun lexemeTree(s: List<String>): lexNode.exprNode<String> {
         var parentNode = lexNode.exprNode<String>(s[1])
         var valNode = lexNode.numNode<String>(s[0])
         header = parentNode
-        header.setLhs (valNode)
+        header.setLhs(valNode)
+        current = parentNode
     }
+    return lexemeSorter (s, header)
+}
 
-    for (i in 0 until s.size) {
+fun lexemeSorter (s: List<String>, h: lexNode.exprNode<String>): lexNode.exprNode<String> {
+    var header = h
+    var current = h
+    for (i in 2 until s.size) {
         when (s[i]) {
             "PLUS" -> {
                 var newNode = lexNode.exprNode<String>(s[i])
@@ -39,6 +50,9 @@ fun lexemeTree(s: List<String>): lexNode.exprNode<String> {
                     newNode.setPar (current)
                 }
                 current = newNode
+                if (header.parent != null) {
+                    header = current
+                }
             }
             "DIVIDES" -> {
                 var newNode = lexNode.exprNode<String>(s[i])
@@ -56,6 +70,9 @@ fun lexemeTree(s: List<String>): lexNode.exprNode<String> {
                     newNode.setPar (current)
                 }
                 current = newNode
+                if (header.parent != null) {
+                    header = current
+                }
             }
             "POWER" -> {
                 var newNode = lexNode.exprNode<String>(s[i])
@@ -71,6 +88,9 @@ fun lexemeTree(s: List<String>): lexNode.exprNode<String> {
                     newNode.setPar (current)
                 }
                 current = newNode
+                if (header.parent != null) {
+                    header = current
+                }
             }
             "LPAREN" -> {
                 var recursiveList = mutableListOf<String>()
@@ -86,6 +106,7 @@ fun lexemeTree(s: List<String>): lexNode.exprNode<String> {
                 newNode.setPar (current)
                 current = newNode
             }
+            "RPAREN" -> {}
             "PI" -> {
                 var newNode = lexNode.numNode<String>(Math.PI.toString())
                 current.setRhs (newNode)
