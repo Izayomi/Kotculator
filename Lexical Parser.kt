@@ -1,11 +1,10 @@
 fun main () {
-    var stringer = lexemeTree (mutableListOf ("E", "POWER", "LPAREN", "PI", "MINUS", "NUMBER(2)", "RPAREN"))
+    var stringer = lexemeTree (mutableListOf ("LPAREN", "LPAREN", "PI", "PLUS", "NUMBER(3)", "RPAREN", "TIMES", "NUMBER(6)", "RPAREN", "MINUS", "LPAREN", "E", "PLUS", "E", "RPAREN"))
     printEvaluatorOrder (stringer)
 }
 
 fun lexemeTree (s: MutableList<String>): lexNode.exprNode<String> {
     var header = lexNode.exprNode<String>("")
-
     if (s[0] != "LPAREN") {
         var parentNode = lexNode.exprNode<String>(s[1])
         var valNode =
@@ -23,21 +22,31 @@ fun lexemeTree (s: MutableList<String>): lexNode.exprNode<String> {
         header = parentNode
         header.setLhs(valNode)
     } else {
-        var recursiveList = mutableListOf<String>()
-        loop@ for (i in 1 until s.size) {
-            if (s[i] != "RPAREN") {
-                recursiveList.add(s[i])
-            } else {
-                break@loop
-            }
-        }
+        var recursiveList = recLexemeList(s, 1)
         for (k in 0 until recursiveList.size + 2) {
             s[k] = "RPAREN"
         }
         header = lexemeTree(recursiveList)
         if (recursiveList.size + 2 < s.size) {
             var opNode = lexNode.exprNode<String> (s[recursiveList.size + 2])
-            var valNode = lexNode.numNode<String> (s[recursiveList.size + 3].substring(7, s[recursiveList.size + 3].indexOf(")")))
+            var valNode = when (s[recursiveList.size + 3]) {
+                "PI" -> {
+                    lexNode.numNode<String> (Math.PI.toString())
+                }
+                "E" -> {
+                    lexNode.numNode<String> (Math.E.toString())
+                }
+                "LPAREN" -> {
+                    var newRecList = recLexemeList(s, recursiveList.size + 4)
+                    for (k in 0 until newRecList.size) {
+                        s[recursiveList.size + 4 + k] = "RPAREN"
+                    }
+                    lexemeTree (newRecList)
+                }
+                else -> {
+                    lexNode.numNode<String> (s[recursiveList.size + 3].substring (7, s[recursiveList.size + 3].indexOf (")")))
+                }
+            }
             opNode.setLhs (header)
             opNode.setRhs (valNode)
             header.setPar (opNode)
@@ -162,15 +171,25 @@ fun printEvaluatorOrder (s: lexNode.exprNode<String>) {
     print (s.getLhs ()?.value)
     print (s.value)
     print (s.getRhs ()?.value)
-    /*if (s.getLhs () is lexNode.numNode<String>) {
-        print (s.getLhs ()?.value + " ")
-        print (s.value + " ")
-        if (s.getRhs () is lexNode.numNode<String>) {
-            print (s.getRhs ()?.value + " ")
-        } else {
-            printEvaluatorOrder (s.getRhs () as lexNode.exprNode<String>)
+}
+
+fun recLexemeList (s: List<String>, j: Int): MutableList<String> {
+    var r = mutableListOf<String>()
+    var lParenCount = 0
+    loop@ for (i in j until s.size) {
+        if (s[i] == "LPAREN") {
+            lParenCount++
         }
-    } else {
-        printEvaluatorOrder (s.getLhs () as lexNode.exprNode<String>)
-    }*/
+        if (s[i] == "RPAREN") {
+            if (lParenCount == 0) {
+                break@loop
+            } else {
+                r.add(s[i])
+                lParenCount--
+            }
+        } else {
+            r.add(s[i])
+        }
+    }
+    return r
 }
