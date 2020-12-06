@@ -1,18 +1,39 @@
 fun main () {
-    var stringer = lexemeTree (mutableListOf ("NUMBER(7)", "TIMES", "LPAREN", "NUMBER(5)", "PLUS", "NUMBER(3)", "RPAREN", "PLUS", "NUMBER(9)"))
+    var stringer = lexemeTree (mutableListOf ("NUMBER(1.8)", "PLUS", "LPAREN", "NUMBER(9)", "TIMES", "NUMBER(4)", "RPAREN", "POWER", "NUMBER(7)"))
     printEvaluatorOrder (stringer)
 }
 
 fun lexemeTree (s: MutableList<String>): lexNode.exprNode<String> {
     var header = lexNode.exprNode<String>("")
-    var current = header
 
     if (s[0] != "LPAREN") {
         var parentNode = lexNode.exprNode<String>(s[1])
         var valNode = lexNode.numNode<String>(s[0].substring(7, s[0].indexOf(")")))
         header = parentNode
         header.setLhs(valNode)
-        current = parentNode
+    } else {
+        var recursiveList = mutableListOf<String>()
+        loop@ for (i in 1 until s.size) {
+            if (s[i] != "RPAREN") {
+                recursiveList.add(s[i])
+            } else {
+                break@loop
+            }
+        }
+        for (k in 0 until recursiveList.size + 2) {
+            s[k] = "RPAREN"
+        }
+        header = lexemeTree(recursiveList)
+        if (recursiveList.size + 2 < s.size) {
+            var opNode = lexNode.exprNode<String> (s[recursiveList.size + 2])
+            var valNode = lexNode.numNode<String> (s[recursiveList.size + 3].substring(7, s[recursiveList.size + 3].indexOf(")")))
+            opNode.setLhs (header)
+            opNode.setRhs (valNode)
+            header.setPar (opNode)
+            header = opNode
+            s[recursiveList.size + 2] = "RPAREN"
+            s[recursiveList.size + 3] = "RPAREN"
+        }
     }
     return lexemeSorter (s, header)
 }
@@ -107,7 +128,6 @@ fun lexemeSorter (s: MutableList<String>, h: lexNode.exprNode<String>): lexNode.
                 var newNode = lexemeTree(recursiveList)
                 current.setRhs(newNode)
                 newNode.setPar (current)
-                current = newNode
             }
             "RPAREN" -> {}
             "PI" -> {
