@@ -1,15 +1,15 @@
 fun main () {
-    var stringer = lexemeTree (mutableListOf ("NUM(1.0)", "POWER", "NUM(2.0)", "TIMES", "NUM(17.0)", "PLUS", "LPAREN", "NUM(1.0)", "POWER", "NUM(5.6)", "RPAREN"))
-    print (stringer.value)
+    var stringer = lexemeTree (mutableListOf ("NUMBER(7)", "TIMES", "LPAREN", "NUMBER(5)", "PLUS", "NUMBER(3)", "RPAREN", "PLUS", "NUMBER(9)"))
+    printEvaluatorOrder (stringer)
 }
 
-fun lexemeTree (s: List<String>): lexNode.exprNode<String> {
+fun lexemeTree (s: MutableList<String>): lexNode.exprNode<String> {
     var header = lexNode.exprNode<String>("")
     var current = header
 
     if (s[0] != "LPAREN") {
         var parentNode = lexNode.exprNode<String>(s[1])
-        var valNode = lexNode.numNode<String>(s[0])
+        var valNode = lexNode.numNode<String>(s[0].substring(7, s[0].indexOf(")")))
         header = parentNode
         header.setLhs(valNode)
         current = parentNode
@@ -17,7 +17,7 @@ fun lexemeTree (s: List<String>): lexNode.exprNode<String> {
     return lexemeSorter (s, header)
 }
 
-fun lexemeSorter (s: List<String>, h: lexNode.exprNode<String>): lexNode.exprNode<String> {
+fun lexemeSorter (s: MutableList<String>, h: lexNode.exprNode<String>): lexNode.exprNode<String> {
     var header = h
     var current = h
     for (i in 2 until s.size) {
@@ -94,12 +94,15 @@ fun lexemeSorter (s: List<String>, h: lexNode.exprNode<String>): lexNode.exprNod
             }
             "LPAREN" -> {
                 var recursiveList = mutableListOf<String>()
-                loop@ for (j in i until s.size) {
+                loop@ for (j in (i + 1) until s.size) {
                     if (s[j] != "RPAREN") {
                         recursiveList.add(s[j])
                     } else {
                         break@loop
                     }
+                }
+                for (k in 0 until recursiveList.size + 2) {
+                    s[k + i] = "RPAREN"
                 }
                 var newNode = lexemeTree(recursiveList)
                 current.setRhs(newNode)
@@ -122,4 +125,21 @@ fun lexemeSorter (s: List<String>, h: lexNode.exprNode<String>): lexNode.exprNod
         }
     }
     return header
+}
+
+fun printEvaluatorOrder (s: lexNode.exprNode<String>) {
+    print (s.getLhs ()?.value)
+    print (s.value)
+    print (s.getRhs ()?.value)
+    /*if (s.getLhs () is lexNode.numNode<String>) {
+        print (s.getLhs ()?.value + " ")
+        print (s.value + " ")
+        if (s.getRhs () is lexNode.numNode<String>) {
+            print (s.getRhs ()?.value + " ")
+        } else {
+            printEvaluatorOrder (s.getRhs () as lexNode.exprNode<String>)
+        }
+    } else {
+        printEvaluatorOrder (s.getLhs () as lexNode.exprNode<String>)
+    }*/
 }
