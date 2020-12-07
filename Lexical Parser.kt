@@ -1,5 +1,10 @@
 class LexParserKt {
 
+    /* LEXEME TREE
+     * Functionality: Finally we've arrived at Stage 2, this serves as the main function. Also offers recursion to
+     * those "peculiar" cases of ours (parentheses can die in a hellfire)
+     * Author's Comments: Parentheses can die in a hellfire. Vent over
+     */
     fun lexemeTree (s: MutableList<String>): lexNode.exprNode<String> {
         var header = lexNode.exprNode<String>("")
         if (s[0] != "LPAREN") {
@@ -55,6 +60,13 @@ class LexParserKt {
         return lexemeSorter (s, header)
     }
 
+    /* LEXEME SORTER
+     * Functionality: Takes in a string from the list, and decides what to do with it based on the node that's
+     * currently pointed at. Wanna make it a right child of the current, or maybe even the new header of the tree? The
+     * only reason we keep this behemoth around is because it's effective
+     * Author's Comments: Direct your attention to the RPAREN check, the single most important line of code within this
+     * method. "Why" you might say. "It's completely empty" you will say. Well uhhh.....     ;))))))
+     */
     fun lexemeSorter (s: MutableList<String>, h: lexNode.exprNode<String>): lexNode.exprNode<String> {
         var header = h
         var current = h
@@ -157,6 +169,12 @@ class LexParserKt {
         return header
     }
 
+    /* RECURSIVE LEXEME LIST
+     * Functionality: A simple helper function that helps with recursion over the parentheses, specifically for
+     * determining the length of a parenthetical expression. The only time you'll see a counter being used within these
+     * files
+     * Author's Comments: Parentheses can die in a hellfire. Sorry I lied about the vent being over
+     */
     fun recLexemeList (s: List<String>, j: Int): MutableList<String> {
         var r = mutableListOf<String>()
         var lParenCount = 0
