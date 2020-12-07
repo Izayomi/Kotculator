@@ -1,9 +1,5 @@
 class LexParserKt {
 
-    fun main () {
-        var stringer = lexemeTree (mutableListOf ("NUMBER(4)", "PLUS", "LPAREN", "NUMBER(9)", "MINUS", "LPAREN", "NUMBER(0)", "TIMES", "NUMBER(7)", "RPAREN", "RPAREN"))
-    }
-
     fun lexemeTree (s: MutableList<String>): lexNode.exprNode<String> {
         var header = lexNode.exprNode<String>("")
         if (s[0] != "LPAREN") {
@@ -171,17 +167,8 @@ class LexParserKt {
                     current.setRhs (newNode)
                 }
             }
-            //println (s)
-            //println ("header: " + header.value)
-            printEvaluatorOrder (header)
         }
         return header
-    }
-
-    fun printEvaluatorOrder (s: lexNode.exprNode<String>) {
-        print (s.getLhs ()?.value)
-        print (s.value)
-        println (s.getRhs ()?.value)
     }
 
     fun recLexemeList (s: List<String>, j: Int): MutableList<String> {
