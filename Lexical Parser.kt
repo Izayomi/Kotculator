@@ -123,20 +123,23 @@ class LexParserKt {
                 "POWER" -> {
                     var newNode = lexNode.exprNode<String>(s[i])
                     if (current.value == "POWER") {
-                        var parentNode = current.getPar ()
-                        parentNode?.setRhs (newNode)
-                        newNode.setLhs (current)
-                        current.setPar (newNode)
-                        newNode.setPar (parentNode)
-                    } else {
                         newNode.setLhs (current.getRhs ())
                         current.setRhs (newNode)
                         newNode.setPar (current)
+                    } else {
+                        if (current.getPar () != null) {
+                            var parentNode = current.getPar ()
+                            parentNode?.setRhs (newNode)
+                            newNode.setLhs (current)
+                            current.setPar (newNode)
+                            newNode.setPar (parentNode)
+                        } else {
+                            newNode.setLhs(header)
+                            header.setPar (newNode)
+                            header = newNode
+                        }
                     }
                     current = newNode
-                    if (header.parent != null) {
-                        header = current
-                    }
                 }
                 "LPAREN" -> {
                     var recursiveList = mutableListOf<String>()
@@ -170,7 +173,7 @@ class LexParserKt {
             }
             //println (s)
             //println ("header: " + header.value)
-            //printEvaluatorOrder (header)
+            printEvaluatorOrder (header)
         }
         return header
     }
