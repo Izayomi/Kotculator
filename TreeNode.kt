@@ -11,45 +11,39 @@ open class lexNode<T>(value: T) {
         var left: lexNode<T>? = null
         var right: lexNode<T>? = null
 
-        fun setLhs (newVal: lexNode<T>) {
+        fun setLhs (newVal: lexNode<T>?) {
             this.left = newVal
         }
 
         fun getLhs (): lexNode<T>? {
-            if (this.left != null) {
-                return this.left
-            }
-
-            else {
-                return this
+            return if (this.left != null) {
+                this.left
+            } else {
+                null
             }
         }
 
-        fun setRhs (newVal: lexNode<T>) {
+        fun setRhs (newVal: lexNode<T>?) {
             this.right = newVal
         }
 
         fun getRhs (): lexNode<T>? {
-            if (this.right != null) {
-                return this.right
-            }
-
-            else {
-                return this
+            return if (this.right != null) {
+                this.right
+            } else {
+                null
             }
         }
 
         fun getPar (): exprNode<T>? {
-            if (this.parent != null) {
-                return this.parent
-            }
-
-            else {
-                return this
+            return if (this.parent != null) {
+                this.parent
+            } else {
+                null
             }
         }
 
-        fun setPar (newVal: exprNode<T>) {
+        fun setPar (newVal: exprNode<T>?) {
             this.parent = newVal
         }
     }
