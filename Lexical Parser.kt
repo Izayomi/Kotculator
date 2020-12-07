@@ -1,5 +1,5 @@
 fun main () {
-    var stringer = lexemeTree (mutableListOf ("LPAREN", "LPAREN", "PI", "PLUS", "NUMBER(3)", "RPAREN", "TIMES", "NUMBER(6)", "RPAREN", "MINUS", "LPAREN", "E", "PLUS", "E", "RPAREN"))
+    var stringer = lexemeTree (mutableListOf ("NUMBER(1)", "PLUS", "NUMBER(2.0)"))
     printEvaluatorOrder (stringer)
 }
 
@@ -143,7 +143,7 @@ fun lexemeSorter (s: MutableList<String>, h: lexNode.exprNode<String>): lexNode.
                     }
                 }
                 for (k in 0 until recursiveList.size + 2) {
-                    s[k + i] = "RPAREN"
+                    s[k] = "RPAREN"
                 }
                 var newNode = lexemeTree(recursiveList)
                 current.setRhs(newNode)
