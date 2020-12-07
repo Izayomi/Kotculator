@@ -5,7 +5,7 @@ fun main () {
         var str = readLine ().toString ()
 
         str = inputStringModifier (str)
-        var lexemeList = fillLexemeList (str)
+        var lexemeList: List<String> = fillLexemeList (str)
         lexicalAnalysis (lexemeList)
 
         print ("Continue? (Enter 0 to stop): ")
@@ -90,15 +90,19 @@ fun lexicalAnalysis (lexemeList: List <String>) {
             "DIVIDES" ->
                 if (!lexemeList [i + 1].startsWith("NUM") && lexemeList [i + 1] != "LPAREN"
                         && lexemeList [i + 1] != "PI" && lexemeList [i + 1] != "E") {
-                    throw ArithmeticException("Invalid syntax: operator must be followed by a number or lparen")
+                    throw ArithmeticException ("Invalid syntax: operator must be followed by a number or lparen")
                 } else if (lexemeList[i + 1] == "NUMBER(0.0)") {
                     throw ArithmeticException ("Invalid syntax: cannot divide by zero")
                 }
-            "LPAREN" -> if ((!lexemeList [i + 1].startsWith("NUM") && lexemeList [i + 1] != "PI"
-                            && lexemeList [i + 1] != "E" && lexemeList [i + 1] != "LPAREN")
-                            || lexemeList [i + 1] == "RPAREN") {
+            "LPAREN" ->
+                if  ((!lexemeList [i + 1].startsWith("NUM") && lexemeList [i + 1] != "PI"
+                                && lexemeList [i + 1] != "E" && lexemeList [i + 1] != "LPAREN")
+                        || lexemeList [i + 1] == "RPAREN") {
                     throw ArithmeticException ("Invalid syntax: lparen must be followed by a numeric  value or" +
                             "another lparen")
+                } else if ((lexemeList [i + 1].startsWith("NUM") || lexemeList [i + 1] != "E"
+                                || lexemeList [i + 1] == "E" ) && lexemeList [i + 2] == "RPAREN"){
+                    throw ArithmeticException ("Invalid syntax: nesting a single number in parentheses is obsolete")
                 } else {
                     lParenCount++
                 }
