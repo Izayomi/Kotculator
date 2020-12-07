@@ -118,23 +118,9 @@ class LexParserKt {
                 }
                 "POWER" -> {
                     var newNode = lexNode.exprNode<String>(s[i])
-                    if (current.value == "POWER") {
-                        newNode.setLhs (current.getRhs ())
-                        current.setRhs (newNode)
-                        newNode.setPar (current)
-                    } else {
-                        if (current.getPar () != null) {
-                            var parentNode = current.getPar ()
-                            parentNode?.setRhs (newNode)
-                            newNode.setLhs (current)
-                            current.setPar (newNode)
-                            newNode.setPar (parentNode)
-                        } else {
-                            newNode.setLhs(header)
-                            header.setPar (newNode)
-                            header = newNode
-                        }
-                    }
+                    newNode.setLhs (current.getRhs ())
+                    current.setRhs (newNode)
+                    newNode.setPar (current)
                     current = newNode
                 }
                 "LPAREN" -> {
